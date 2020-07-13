@@ -1,0 +1,103 @@
+CREATE TABLE parent_ip (
+    id SERIAL PRIMARY KEY,
+    name varchar(80),
+    ip varchar(20),
+    snmp_ver varchar(20),
+    community_string varchar(20),
+    sysdescr varchar(80),
+    syslocation varchar(80),
+    status_uptime varchar(10)
+    );
+
+CREATE TABLE traffic_int (
+    id SERIAL PRIMARY KEY,
+    name varchar(80),
+    ip varchar(20),
+    interface int,
+    cur_status varchar(10),
+    availability real
+    );
+
+CREATE TABLE sqf_client (
+    id SERIAL PRIMARY KEY,
+    name varchar(80),
+    ip varchar(20),
+    cur_value int,
+    cur_status varchar(10),
+    availability real
+    );
+
+CREATE TABLE uptime (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    ip varchar(20),
+    sysuptime bigint,
+    status varchar(10),
+    availability real,
+    downtime bigint, 
+    message varchar(80)
+    );
+
+CREATE TABLE traffic (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    ip varchar(20),
+    interface int,
+    volume_total bigint,
+    speed_total bigint,
+    volume_in bigint,
+    speed_in bigint,
+    volume_out bigint,
+    speed_out bigint,
+    status varchar(10),
+    availability real,
+    volume_in_raw bigint,
+    volume_out_raw bigint,
+    message varchar(80)
+    );
+
+CREATE TABLE ping (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    ip varchar(20),
+    pingtime real,
+    pingmin real,
+    pingmax real,
+    packetloss real,
+    status varchar(10),
+    availability real,
+    message varchar(80)
+    );
+
+CREATE TABLE sqf (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    ip varchar(20),
+    sqf_value int,
+    status varchar(20),
+    availability real,
+    message varchar(80)
+    );
+
+CREATE TABLE notification (
+    id SERIAL PRIMARY KEY,
+    parameter varchar(20),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    name varchar(80),
+    ip varchar(20),
+    interface int,
+    message varchar(80),
+    status varchar(10)
+    );
+
+
+CREATE TABLE logs(
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    name varchar(80),
+    ip varchar(20),
+    parameter varchar(50),
+    status varchar(10),
+    message varchar(80)
+    interface int
+    );
