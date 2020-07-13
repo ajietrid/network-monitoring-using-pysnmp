@@ -1,0 +1,238 @@
+{% extends "base-site.html" %}
+
+{% block title %} Logs {% endblock %} 
+
+{% block content %}
+
+
+    <div class="row">
+        <div class="col-lg-8">
+            
+            <section class="widget xlarge">
+                <div class="widget-body">
+                    <h3>Log Entries <span class="fw-semi-bold">Table</span></h3>
+                    <div id="client-table" class="table-responsive auto_scroll">
+                        <table id="myTable2" class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Date Time <i class="fa fa-sort" onclick="sortTable(1)"></th>
+                                <th>Device Name</th>
+                                <th>Sensor</th>
+                                <th>Status</th>
+                                <th>Message</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in logs %}
+                            <tr>
+                                <td>{{ item[1] }}</td>
+                                {% for row in client %}
+                                {% if row[1] == item[3]  %}
+                                <td><a href="/device/{{ row[4] }}"> {{ item[2] }} - {{ item[3] }} </a>
+                                </td>
+                                {% endif %}
+                                {% endfor %}
+                                <td>{{ item[4] }} </td>
+                                <td>{{ item[5] }}</td>
+                                <td>{{ item[6] }}</td>
+                            </tr>
+                            {% endfor %}
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-4">
+            <section class="widget large">
+                <header>
+                    <h4>
+                        Alarm Notification
+                        <span class="label label-important"> {{ counter }} </span>
+                    </h4>
+                </header>
+                <div class="body">
+                    <div id="feed" class="feed">
+                        <div class="wrapper">
+                            <div class="vertical-line"></div>
+                        {% for item in alarm %}
+                            
+                            <section class="feed-item">
+                            {% if item[1] == 'uptime' %}
+                                <div class="icon pull-left">
+                                    <i class="fa fa-power-off color-orange"></i>
+                                </div>
+                                <div class="feed-item-body">
+                                    {% for row in client %}
+                                    {% if row[1] == item[4]  %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }} </a> {{ item[6] }}
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="time pull-left">
+                                        {{ item[2] }} - Status: <span class="fw-semi-bold color-orange">{{ item[7] }}</span> 
+                                    </div>
+                                    
+                                </div>
+
+                            {% elif item[1] == 'traffic' %}
+                                <div class="icon pull-left">
+                                    <i class="fa fa-exclamation-triangle color-red"></i>
+                                </div>
+                                <div class="feed-item-body">
+                                    {% for row in client %}
+                                    {% if row[1] == item[4]  %}
+                                    {% if item[5] == 23 %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }}  </a>  : {{ item[6] }} from ether0 interface.
+                                    </div>
+                                    {% elif item[5] == 24 %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }}  </a>  : {{ item[6] }} from sat interface.
+                                    </div>
+                                    {% else %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }}  </a>  : {{ item[6] }} from {{ item[5] }} interface.
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="time pull-left">
+                                        {{ item[2] }} - Status: <span class="fw-semi-bold color-orange">{{ item[7] }}</span> 
+                                    </div>
+                                </div>
+
+                            {% elif item[1] == 'ping' %}
+                                <div class="icon pull-left">
+                                    <i class="glyphicon glyphicon-question-sign color-orange"></i>
+                                </div>
+                                <div class="feed-item-body">
+                                    {% for row in client %}
+                                    {% if row[1] == item[4]  %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }} </a> {{ item[6] }}
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="time pull-left">
+                                        {{ item[2] }} - Status: <span class="fw-semi-bold color-orange">{{ item[7] }}</span> 
+                                    </div>
+                                    
+                                </div>
+
+                            {% elif item[1] == 'sqf' %}
+                                <div class="icon pull-left">
+                                    <i class="fa fa-signal color-orange"></i>
+                                </div>
+                                <div class="feed-item-body">
+                                    {% for row in client %}
+                                    {% if row[1] == item[4]  %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }} </a> {{ item[6] }}
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="time pull-left">
+                                        {{ item[2] }} - Status: <span class="fw-semi-bold color-orange">{{ item[7] }}</span> 
+                                    </div>
+                                    
+                                </div>
+                            {% endif %}
+
+                            </section>
+                        {% endfor %}
+                            
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+                       
+            
+            <section class="widget">
+                <header>
+                    <h4>
+                        Server Overview
+                    </h4>
+                    <div class="actions">
+                        <small class="text-muted pull-right">last refresh</small>
+                    </div>
+                </header>
+                <div class="body">
+                    <ul class="server-stats">
+                        <li>
+                            <div class="key pull-right">CPU</div>
+                            <div class="stat">
+                                <div class="info">{{ selfmon[0][0] }}% / Current: {{ selfmon[0][1] }} Ghz</div>
+                                <div class="progress progress-small">
+                                    <div class="progress-bar progress-bar-danger" style="width: {{ selfmon[0][0] }}%;"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="key pull-right">Memory</div>
+                            <div class="stat">
+                                <div class="info">{{ selfmon[1][2] }}% / {{ selfmon[1][0] }}GB ({{ selfmon[1][1] }} GB)</div>
+                                <div class="progress progress-small">
+                                    <div class="progress-bar" style="width: {{ selfmon[1][2] }}%;"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <!--<li>
+                            <div class="key pull-right">LAN</div>
+                            <div class="stat">
+                                <div class="info">6 Mb/s <i class="fa fa-caret-down"></i> &nbsp; 3 Mb/s <i class="fa fa-caret-up"></i></div>
+                                <div class="progress progress-small">
+                                    <div class="progress-bar progress-bar-inverse" style="width: 48%;"></div>
+                                </div>
+                            </div>
+                        </li> -->
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    <!-- page specific scripts -->
+    <!-- page libs -->
+    <script src="/static/assets/lib/slimScroll/jquery.slimscroll.min.js"></script>
+    <script src="/static/assets/lib/jquery.sparkline/index.js"></script>
+
+    <script src="/static/assets/lib/backbone/backbone.js"></script>
+    <script src="/static/assets/lib/backbone.localStorage/build/backbone.localStorage.min.js"></script>
+
+    <script src="/static/assets/lib/d3/d3.min.js"></script>
+    <script src="/static/assets/lib/nvd3/build/nv.d3.min.js"></script>
+
+    <!-- page application js -->
+    <script src="/static/assets/js/index.js"></script>
+    <script src="/static/assets/js/chat.js"></script>
+    <script src="/static/assets/js/sortTable.js"></script>
+
+    <!-- page template -->
+    <script type="text/template" id="message-template">
+        <div class="sender pull-left">
+            <div class="icon">
+                <img src="/static/assets/img/2.png" class="img-circle" alt="">
+            </div>
+            <div class="time">
+                just now
+            </div>
+        </div>
+        <div class="chat-message-body">
+            <span class="arrow"></span>
+            <div class="sender"><a href="#">Tikhon Laninga</a></div>
+            <div class="text">
+                <%- text %>
+            </div>
+        </div>
+    </script>
+
+{% endblock javascripts %}

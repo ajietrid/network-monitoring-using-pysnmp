@@ -1,0 +1,261 @@
+{% extends "base-site.html" %}
+
+{% block title %} Device {% endblock %} 
+
+{% block content %}
+
+    <h2 class="page-title">Device <small>{{ by_id[1] }} - {{ by_id[2] }}</small></h2>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <section class="widget">
+                <header>
+                    <p>Updated in estimated five minutes</p>
+                </header>
+                <div class="widget-table-overflow">
+                    <table id="myTable2" class="table table-striped table-lg mt-sm mb-0 sources-table auto_numbering">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Sensor <i class="fa fa-sort" onclick="sortTable(1)"></i></th>
+                            <th>Status</th>
+                            <th>Message</th>
+                            <th class="chart-col-header hidden-xs">Graph</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in logs %}
+                        {% if item[4] == 'Uptime' %}
+                        <tr> 
+                            <td></td>
+                            <td><a href="/device/{{ by_id[0] }}/uptime">Uptime</a>
+                            </td>                
+                            {% if item[5] == 'Up' %}
+                            <td>
+                                <span class="label label-success">Up</span>
+                            </td>
+                            {% elif item[5] == 'Down' %}
+                            <td>
+                                <span class="label label-important">Down</span>
+                            </td>
+                            {% endif %}    
+                            <td class="hidden-xs">{{ item[6] }}</td>
+                            <td class="chart-cell hidden-xs">
+                                <div id="uptime-spark">
+                                    <script type="text/javascript">
+                                        var data_1 = {{ uptime_sparkline }};
+                                    </script>
+                                </div>
+                            </td>
+                        </tr>
+                        {% elif item[4] == 'Traffic' %}
+                        <tr> 
+                            <td></td>
+                            {% if item[7] == 23 %}
+                            <td>
+                                <a href="/device/{{ by_id[0] }}/traffic/{{ item[7] }}">Traffic : ether0 Interface</a>
+                            </td>
+                            {% elif item[7] == 24 %}
+                            <td>
+                                <a href="/device/{{ by_id[0] }}/traffic/{{ item[7] }}">Traffic : sat Interface</a>
+                            </td>
+                            {% else %}
+                            <td>
+                                <a href="#">Traffic : {{ item[7] }} Interface</a>
+                            </td>
+                            {% endif %}
+
+                                {% if item[5] == 'Up' %}
+                            <td>
+                                <span class="label label-success">Up</span>
+                            </td>
+                                {% elif item[5] == 'Down' %}
+                            <td>
+                                <span class="label label-important">Down</span>
+                            </td>
+                                {% endif %}  
+
+                            <td class="hidden-xs">{{ item[6] }}</td>
+                            
+                            {% if item[7] == 23 %}
+                            <td class="chart-cell hidden-xs">
+                                <div id="traffic23-spark">
+                                    <script type="text/javascript">
+                                        var data_2 = {{ traffic_sparkline_23  }};
+                                    </script>
+                                </div>
+                            </td>
+                            {% elif item[7] == 24 %}
+                            <td class="chart-cell hidden-xs">
+                                <div id="traffic24-spark">
+                                    <script type="text/javascript">
+                                        var data_3 = {{ traffic_sparkline_24  }};
+                                    </script>
+                                </div>
+                            </td>
+                            {% endif %}
+
+                        </tr>
+                        {% elif item[4] == 'Ping' %}
+                        <tr>
+                            <td></td>
+                            <td><a href="/device/{{ by_id[0] }}/ping">Ping</a></td>
+                                {% if item[5] == 'Up' %}
+                            <td>
+                                <span class="label label-success">Up</span>
+                            </td>
+                                {% elif item[5] == 'Down' %}
+                            <td>
+                                <span class="label label-important">Down</span>
+                            </td>
+                                {% endif %}    
+                            <td class="hidden-xs">{{ item[6] }}</td>
+                            <td class="chart-cell hidden-xs">
+                                <div id="ping-spark">
+                                    <script type="text/javascript">
+                                        var data_4 = {{ ping_sparkline }};
+                                    </script>
+                                </div>
+                            </td>
+                        </tr>
+                        {% elif item[4] == 'Signal Quality Factor' %}
+                        <tr>
+                            <td></td>
+                            <td><a href="/device/{{ by_id[0] }}/sqf">Signal Quality Factor</a></td>
+                                {% if item[5] == 'Up' %}
+                            <td>
+                                <span class="label label-success">Up</span>
+                            </td>
+                                {% elif item[5] == 'Down' %}
+                            <td>
+                                <span class="label label-important">Down</span>
+                            </td>
+                                {% endif %}    
+                            <td class="hidden-xs">{{ item[6] }}</td>
+                            <td class="chart-cell hidden-xs">
+                                <div id="sqf-spark">
+                                    <script type="text/javascript">
+                                        var data_5 = {{ sqf_sparkline  }};
+                                    </script>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-4">
+            <section class="widget">
+                <header class="text-align-center">
+                    <h4>
+                        {% if msg %}
+                        {{ msg | safe }}
+                        {% else %}
+                        Add New Interface
+                        {% endif %}
+                    </h4>
+                </header>
+                <div class="body">
+
+                    <form role="form" method="post" action="">
+
+                        {{ form.hidden_tag() }}
+
+                        <fieldset>
+
+                            <div class="form-group">
+                                <label for="interface">Interface</label>
+                                <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-desktop"></i>
+                                        </span>
+                                    {{ form.interface(placeholder="Interface", class="form-control input-lg input-transparent") }}
+                                </div>
+                            </div>
+
+                        </fieldset>
+                        <div class="form-actions">
+                            <button type="submit" name="addnewinterface" class="btn btn-block btn-lg btn-danger">
+                                <span class="small-circle"><i class="fa fa-caret-right"></i></span>
+                                <small>Submit</small>
+
+                            </button>
+                            <p></p>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="widget">
+                <header>
+                    <h4>
+                        Server Overview
+                    </h4>
+                    <div class="actions">
+                        <small class="text-muted pull-right">last refresh</small>
+                    </div>
+                </header>
+                <div class="body">
+                    <ul class="server-stats">
+                        <li>
+                            <div class="key pull-right">CPU</div>
+                            <div class="stat">
+                                <div class="info">{{ selfmon[0][0] }}% / Current: {{ selfmon[0][1] }} Ghz</div>
+                                <div class="progress progress-small">
+                                    <div class="progress-bar progress-bar-danger" style="width: {{ selfmon[0][0] }}%;"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="key pull-right">Memory</div>
+                            <div class="stat">
+                                <div class="info">{{ selfmon[1][2] }}% / {{ selfmon[1][0] }}GB ({{ selfmon[1][1] }} GB)</div>
+                                <div class="progress progress-small">
+                                    <div class="progress-bar" style="width: {{ selfmon[1][2] }}%;"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <!--<li>
+                            <div class="key pull-right">LAN</div>
+                            <div class="stat">
+                                <div class="info">6 Mb/s <i class="fa fa-caret-down"></i> &nbsp; 3 Mb/s <i class="fa fa-caret-up"></i></div>
+                                <div class="progress progress-small">
+                                    <div class="progress-bar progress-bar-inverse" style="width: 48%;"></div>
+                                </div>
+                            </div>
+                        </li> -->
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    <!-- page specific scripts -->
+    <!-- page libs -->
+    <script src="/static/assets/lib/slimScroll/jquery.slimscroll.min.js"></script>
+    <script src="/static/assets/lib/jquery.sparkline/index.js"></script>
+
+    <script src="/static/assets/lib/backbone/backbone.js"></script>
+    <script src="/static/assets/lib/backbone.localStorage/build/backbone.localStorage.min.js"></script>
+
+    <script src="/static/assets/lib/d3/d3.min.js"></script>
+    <script src="/static/assets/lib/nvd3/build/nv.d3.min.js"></script>
+
+    <!-- page application js -->
+    <script src="/static/assets/js/index.js"></script>
+    <script src="/static/assets/js/chat.js"></script>
+    <script src="/static/assets/js/sortTable.js"></script>
+    <script src="/static/assets/js/sparkline-chart.js"></script>
+
+    <!-- page template -->
+    
+
+{% endblock javascripts %}

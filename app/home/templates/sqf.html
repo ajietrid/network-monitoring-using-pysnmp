@@ -1,0 +1,305 @@
+{% extends "base-site.html" %}
+
+{% block title %} SQF {% endblock %} 
+
+{% block content %}
+    
+    <h2 class="page-title">Device <a href="/device/{{by_id[0]}}"><small>{{ by_id[1] }} - {{ by_id[2] }}</small></a></h2>
+
+    <div class="row">
+        <div class="col-lg-8">
+            
+            <section class="widget">
+                <header>
+                    <h4>
+                        Signal Quality Factor
+                        <small>
+                            Based on live data
+                        </small>
+                    </h4>
+                    <!--
+                    <div class="widget-controls">
+                        <a title="Options" href="#"><i class="glyphicon glyphicon-cog"></i></a>
+                        <a data-widgster="expand" title="Expand" href="#"><i class="glyphicon glyphicon-chevron-up"></i></a>
+                        <a data-widgster="collapse" title="Collapse" href="#"><i class="glyphicon glyphicon-chevron-down"></i></a>
+                        <a data-widgster="close" title="Close" href="#"><i class="glyphicon glyphicon-remove"></i></a>
+                    </div>
+                        -->
+                </header>
+                <div class="body no-margin">
+                    <div id="sqf-chart" class="chart visits-chart">
+    <!-- SQF Data -->
+                        <script type="text/javascript">
+                            var data = [
+                                {
+                                    key: "Signal Quality Factor",
+                                    values: {{ sqf_graph | safe }}
+                                }
+                            ];
+                        </script>
+                        
+                        <svg></svg>
+                    </div>
+                     <!--<div class="visits-info well well-sm">
+                        <div class="row">
+                           <div class="col-sm-3 col-xs-6">
+                                <div class="key"><i class="fa fa-users"></i> Total Traffic</div>
+                                <div class="value">24 541 <i class="fa fa-caret-up color-green"></i></div>
+                            </div>
+                            <div class="col-sm-3 col-xs-6">
+                                <div class="key"><i class="fa fa-bolt"></i> Unique Visits</div>
+                                <div class="value">14 778 <i class="fa fa-caret-down color-red"></i></div>
+                            </div>
+                            <div class="col-sm-3 col-xs-6">
+                                <div class="key"><i class="fa fa-plus-square"></i> Revenue</div>
+                                <div class="value">$3 583.18 <i class="fa fa-caret-up color-green"></i></div>
+                            </div>
+                            <div class="col-sm-3 col-xs-6">
+                                <div class="key"><i class="fa fa-user"></i> Total Sales</div>
+                                <div class="value">$59 871.12 <i class="fa fa-caret-down color-red"></i></div>
+                            </div> 
+                        </div>
+                    </div> -->
+                </div>
+            </section>
+
+            <section class="widget xlarge">
+                <div class="widget-body">
+                    <h3>Signal Quality Factor Live <span class="fw-semi-bold">Table</span></h3>
+                    <div id="client-table" class="table-responsive auto_scroll">
+                        <table id="myTable2" class="table table-hover">
+                            <thead>
+                            <tr>
+                                
+                                <th>Date Time <i class="fa fa-sort" onclick="sortTable(1)"></th>
+                                <th>SQF</th>
+                                <th>Signal Condition</th>
+                                <th>Availability</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in sqf %}
+                            <tr>
+                                <td>{{ item[1] }}</td>
+                                <td>{{ item[3] }}</td>
+                                
+                                {% if item[3] == 0 %}
+                                <td>Down</td>
+                                {% elif item[3] < 32 %}
+                                <td>Not correctly pointed</td>
+                                {% else %}
+                                <td>OK</td>
+                                {% endif %}
+
+                                <td>{{ "{:0.2f}".format(item[5]) }} %</td>
+                            </tr>
+                            {% endfor %}
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-4">
+            <section class="widget large">
+                <header>
+                    <h4>
+                        Alarm Notification
+                        <span class="label label-important"> {{ counter }} </span>
+                    </h4>
+                </header>
+                <div class="body">
+                    <div id="feed" class="feed">
+                        <div class="wrapper">
+                            <div class="vertical-line"></div>
+                        {% for item in alarm %}
+                            
+                            <section class="feed-item">
+                            {% if item[1] == 'uptime' %}
+                                <div class="icon pull-left">
+                                    <i class="fa fa-power-off color-orange"></i>
+                                </div>
+                                <div class="feed-item-body">
+                                    {% for row in client %}
+                                    {% if row[1] == item[4]  %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }} </a> {{ item[6] }}
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="time pull-left">
+                                        {{ item[2] }}   Status Uptime : <span class="fw-semi-bold color-orange">{{ item[7] }}</span> 
+                                    </div>
+                                    
+                                </div>
+
+                            {% elif item[1] == 'traffic' %}
+                                <div class="icon pull-left">
+                                    <i class="fa fa-exclamation-triangle color-red"></i>
+                                </div>
+                                <div class="feed-item-body">
+                                    {% for row in client %}
+                                    {% if row[1] == item[4]  %}
+                                    {% if item[5] == 23 %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }}  </a>  : {{ item[6] }} from ether0 interface.
+                                    </div>
+                                    {% elif item[5] == 24 %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }}  </a>  : {{ item[6] }} from sat interface.
+                                    </div>
+                                    {% else %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }}  </a>  : {{ item[6] }} from {{ item[5] }} interface.
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="time pull-left">
+                                        {{ item[2] }}   Status Traffic : <span class="fw-semi-bold color-orange">{{ item[7] }}</span> 
+                                    </div>
+                                </div>
+
+                            {% elif item[1] == 'ping' %}
+                                <div class="icon pull-left">
+                                    <i class="glyphicon glyphicon-question-sign color-orange"></i>
+                                </div>
+                                <div class="feed-item-body">
+                                    {% for row in client %}
+                                    {% if row[1] == item[4]  %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }} </a> {{ item[6] }}
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="time pull-left">
+                                        {{ item[2] }}   Status Ping : <span class="fw-semi-bold color-orange">{{ item[7] }}</span> 
+                                    </div>
+                                    
+                                </div>
+
+                            {% elif item[1] == 'sqf' %}
+                                <div class="icon pull-left">
+                                    <i class="fa fa-signal color-orange"></i>
+                                </div>
+                                <div class="feed-item-body">
+                                    {% for row in client %}
+                                    {% if row[1] == item[4]  %}
+                                    <div class="text">
+                                        Device <a href="/device/{{ row[4] }}"> {{ item[3] }} - {{ item[4] }} </a> {{ item[6] }}
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="time pull-left">
+                                        {{ item[2] }}   Status SQF : <span class="fw-semi-bold color-orange">{{ item[7] }}</span> 
+                                    </div>
+                                    
+                                </div>
+                            {% endif %}
+
+                            </section>
+                        {% endfor %}
+                            
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="widget">
+                <header>
+                    <h4>
+                        Server Overview
+                    </h4>
+                    <div class="actions">
+                        <small class="text-muted pull-right">last refresh</small>
+                    </div>
+                </header>
+                <div class="body">
+                    <ul class="server-stats">
+                        <li>
+                            <div class="key pull-right">CPU</div>
+                            <div class="stat">
+                                <div class="info">{{ selfmon[0][0] }}% / Current: {{ selfmon[0][1] }} Ghz</div>
+                                <div class="progress progress-small">
+                                    <div class="progress-bar progress-bar-danger" style="width: {{ selfmon[0][0] }}%;"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="key pull-right">Memory</div>
+                            <div class="stat">
+                                <div class="info">{{ selfmon[1][2] }}% / {{ selfmon[1][0] }}GB ({{ selfmon[1][1] }} GB)</div>
+                                <div class="progress progress-small">
+                                    <div class="progress-bar" style="width: {{ selfmon[1][2] }}%;"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <!--<li>
+                            <div class="key pull-right">LAN</div>
+                            <div class="stat">
+                                <div class="info">6 Mb/s <i class="fa fa-caret-down"></i> &nbsp; 3 Mb/s <i class="fa fa-caret-up"></i></div>
+                                <div class="progress progress-small">
+                                    <div class="progress-bar progress-bar-inverse" style="width: 48%;"></div>
+                                </div>
+                            </div>
+                        </li> -->
+                    </ul>
+                </div>
+            </section>
+
+            <section class="widget">
+                <div class="body">
+                    <div>
+                        <a href="/download/sqf/{{ host }}/{{ts}}/0"><button class="btn btn-block btn-lg btn-danger">
+                                <span class="small-circle"><i class="fa fa-caret-right"></i></span>
+                                <small>Download SQF History</small>
+                        </a>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    <!-- page specific scripts -->
+    <!-- page libs -->
+    <script src="/static/assets/lib/slimScroll/jquery.slimscroll.min.js"></script>
+    <script src="/static/assets/lib/jquery.sparkline/index.js"></script>
+
+    <script src="/static/assets/lib/backbone/backbone.js"></script>
+    <script src="/static/assets/lib/backbone.localStorage/build/backbone.localStorage.min.js"></script>
+
+    <script src="/static/assets/lib/d3/d3.min.js"></script>
+    <script src="/static/assets/lib/nvd3/build/nv.d3.min.js"></script>
+
+    <!-- page application js -->
+    <script src="/static/assets/js/index.js"></script>
+    <script src="/static/assets/js/chat.js"></script>
+    <script src="/static/assets/js/sortTable.js"></script>
+
+    <!-- page template -->
+    <script type="text/template" id="message-template">
+        <div class="sender pull-left">
+            <div class="icon">
+                <img src="/static/assets/img/2.png" class="img-circle" alt="">
+            </div>
+            <div class="time">
+                just now
+            </div>
+        </div>
+        <div class="chat-message-body">
+            <span class="arrow"></span>
+            <div class="sender"><a href="#">Tikhon Laninga</a></div>
+            <div class="text">
+                <%- text %>
+            </div>
+        </div>
+    </script>
+
+{% endblock javascripts %}
